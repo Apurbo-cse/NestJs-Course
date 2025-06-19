@@ -22,6 +22,7 @@ export class UsersController {
     @Post()
     createUser(@Body(new ValidationPipe()) user: CreateUserDto) {
         // this.usersService.createUser(user);
+        console.log('user :>> ', user instanceof CreateUserDto);
         return `A new user has been created!`;
     }
 }
