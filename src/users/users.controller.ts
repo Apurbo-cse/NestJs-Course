@@ -23,7 +23,7 @@ export class UsersController {
         const user = {
             id: 3,
             name: 'Harry',
-            age: 23,
+            email: 'harry@gmail.com',
             gender: 'female',
             isMarrid: false,
         };
