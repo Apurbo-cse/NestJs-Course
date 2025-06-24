@@ -1,14 +1,20 @@
-import { Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
+import { AuthService } from "src/auth/auth.service";
 
 @Injectable()
 export class UsersService {
-    users: { id: number; name: string; email: string; gender: string; isMarried: boolean }[] = [
-        { id: 1, name: 'John', email: 'john@gmail.com', gender: 'male', isMarried: false },
-        { id: 2, name: 'Mark', email: 'mark@gmail.com', gender: 'male', isMarried: true },
-        { id: 3, name: 'Joty', email: 'joty@gmail.com', gender: 'female', isMarried: false },
+
+    constructor(@Inject(forwardRef(() => AuthService)) private readonly authService: AuthService) { }
+
+    users: { id: number; name: string; email: string; gender: string; isMarried: boolean, password: string }[] = [
+        { id: 1, name: 'John', email: 'john@gmail.com', gender: 'male', isMarried: false, password: 'test1234' },
+        { id: 2, name: 'Mark', email: 'mark@gmail.com', gender: 'male', isMarried: true, password: 'test1234' },
+        { id: 3, name: 'Joty', email: 'joty@gmail.com', gender: 'female', isMarried: false, password: 'test1234' },
     ];
 
     getAllUsers(isMarried?: boolean, limit?: number, page?: number) {
+
+
         let result = this.users;
 
         if (isMarried !== undefined) {
@@ -20,7 +26,12 @@ export class UsersService {
             result = result.slice(startIndex, startIndex + limit);
         }
 
-        return result;
+        if (this.authService.isAuthenticketd) {
+            return result;
+        }
+        return "You are not logged-in"
+
+
     }
 
 
@@ -29,7 +40,7 @@ export class UsersService {
         return this.users.find((x) => x.id === id);
     }
 
-    createUser(user: { id: number; name: string; email: string; gender: string; isMarried: boolean }) {
+    createUser(user: { id: number; name: string; email: string; gender: string; isMarried: boolean, password: string }) {
         this.users.push(user);
     }
 }
