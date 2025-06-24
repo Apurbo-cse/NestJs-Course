@@ -17,5 +17,5 @@ export class CreateUserDto {
     gender?: string;
 
     @IsBoolean()
-    isMarrid: boolean
+    isMarried: boolean
 }

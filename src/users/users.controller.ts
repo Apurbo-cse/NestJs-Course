@@ -1,17 +1,21 @@
-import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Query, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, DefaultValuePipe, Get, Param, ParseBoolPipe, ParseIntPipe, Patch, Post, Query, ValidationPipe } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dtos/create-user.dto";
+import { GetUserParamDto } from "./dtos/get-user-param.dto";
+import { UpdateUserDto } from "./dtos/update-user-dto";
 
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
 
-    @Get()
+    @Get(':isMarried')
     getUsers(
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+        @Param('isMarried', ParseBoolPipe) isMarried: boolean,
     ) {
-        return this.usersService.getAllUsers();
+        console.log('isMarried :>> ', isMarried);
+        return this.usersService.getAllUsers(isMarried, limit, page);
     }
 
     @Get(':id')
@@ -24,5 +28,11 @@ export class UsersController {
         // this.usersService.createUser(user);
         console.log('user :>> ', user instanceof CreateUserDto);
         return `A new user has been created!`;
+    }
+
+    @Patch()
+    updateUser(@Body() user: UpdateUserDto) {
+        console.log('body :>> ', user);
+        return "User updated successfully!"
     }
 }
