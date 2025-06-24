@@ -6,17 +6,22 @@ import { UpdateUserDto } from "./dtos/update-user-dto";
 
 @Controller('users')
 export class UsersController {
+
     constructor(private readonly usersService: UsersService) { }
 
-    @Get(':isMarried')
+    @Get()
     getUsers(
-        @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-        @Param('isMarried', ParseBoolPipe) isMarried: boolean,
+        @Query('isMarried') isMarriedRaw: string,
+        @Query('limit') limitRaw: string,
+        @Query('page') pageRaw: string,
     ) {
-        console.log('isMarried :>> ', isMarried);
+        const isMarried = isMarriedRaw !== undefined ? isMarriedRaw === 'true' : undefined;
+        const limit = limitRaw !== undefined ? parseInt(limitRaw, 10) : undefined;
+        const page = pageRaw !== undefined ? parseInt(pageRaw, 10) : undefined;
+
         return this.usersService.getAllUsers(isMarried, limit, page);
     }
+
 
     @Get(':id')
     getUserById(@Param('id', ParseIntPipe) id: number) {
