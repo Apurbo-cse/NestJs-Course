@@ -9,7 +9,7 @@ export class User {
 
     @Column({
         type: 'varchar',
-        nullable: false,
+        nullable: true,
         length: 24,
         unique: true
     })
