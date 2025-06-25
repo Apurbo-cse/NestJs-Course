@@ -8,12 +8,7 @@ export class AuthService {
     isAuthenticketd: Boolean = false
 
     login(email: string, pswd: string) {
-        const user = this.userService.users.find(u => u.email === email && u.password === pswd)
-
-        if (user) {
-            this.isAuthenticketd = true
-            return 'MY_TOCKEN'
-        }
+     
         return 'User does not exist!'
     }
 }
