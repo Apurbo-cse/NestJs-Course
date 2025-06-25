@@ -20,7 +20,7 @@ export class CreateProfileDto {
     @IsOptional()
     @IsString()
     @MaxLength(10)
-    gender?: number;
+    gender?: string;
 
     @IsOptional()
     @IsDate()
