@@ -7,17 +7,26 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [UsersModule, TweetModule, AuthModule, TypeOrmModule.forRoot({
-    type: 'postgres',
-    entities: [],
-    synchronize: true,
-    host: 'localhost',
-    port: 5432,
-    username: 'postgres',
-    password: 'admin1234',
-    database: 'nestjs'
-  })],
+  imports: [
+    UsersModule,
+    TweetModule,
+    AuthModule,
+    TypeOrmModule.forRootAsync({
+      imports: [],
+      inject:[],
+      useFactory: () => ({
+        type: 'postgres',
+        host: 'localhost',
+        port: 5432,
+        username: 'postgres',
+        password: 'admin1234',
+        database: 'nestjs',
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: true,
+      }),
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
