@@ -27,7 +27,7 @@ export class UsersService {
     public async createUser(userDto: CreateUserDto) {
 
         // Create a Profile & Save
-        // userDto.profile = userDto.profile ?? {}
+        userDto.profile = userDto.profile ?? {}
  
         // Create User Object
         let user = this.userRepository.create(userDto)
