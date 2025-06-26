@@ -28,13 +28,28 @@ export class UsersService {
 
         // Create a Profile & Save
         userDto.profile = userDto.profile ?? {}
- 
+
         // Create User Object
         let user = this.userRepository.create(userDto)
 
         // Save the user object
         return await this.userRepository.save(user)
+    }
 
+    public async deleteUser(id: number) {
 
+        // Find the user with given ID
+        let user = await this.userRepository.findOneBy({ id })
+
+        // Delete User
+        await this.userRepository.delete(id)
+
+        // Delete the profile
+        if (user?.profile?.id) {
+            await this.profileRepository.delete(user.profile.id);
+        }
+
+        // Send a response
+        return { delete: true }
     }
 }
