@@ -9,7 +9,11 @@ export class ProfileService {
     private readonly profileRepository: Repository<Profile>) { }
 
 
-    public getAllProfiles(){
-        return this.profileRepository.find()
+    public getAllProfiles() {
+        return this.profileRepository.find({
+            relations: {
+                user: true
+            }
+        })
     }
 }
