@@ -14,11 +14,14 @@ export class TweetService {
     ) { }
 
 
-    getTweets(userId: number) {
-
+    public async getTweets(userId: number) {
+        return await this.tweetRepository.find({
+            where: { user: { id: userId } }, relations: { user: true }
+        })
     }
 
     public async CreateTweet(createTweetDto: CreateTweetDto) {
+
         // Fetch the full user entity using the userId
         const user = await this.usersService.findUserById(createTweetDto.userId);
         if (!user) {
@@ -33,7 +36,5 @@ export class TweetService {
         // Save the tweet
         return await this.tweetRepository.save(tweet);
     }
-
-
 
 }
