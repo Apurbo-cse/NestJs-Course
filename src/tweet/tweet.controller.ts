@@ -1,13 +1,22 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { TweetService } from './tweet.service';
+import { CreateTweetDto } from './dto/create-tweets.dto';
 
-@Controller('tweet')
+@Controller('tweets')
 export class TweetController {
     constructor(private readonly tweetService: TweetService) { }
 
-    @Get(':userId')
-    public GetTweets(@Param('userId', ParseIntPipe) userid: number) {
-        return this.tweetService.getTweets(userid);
-    }
-}
 
+    @Get(':userId')
+    async getUserTweets(@Param('userId') userId: number) {
+        return this.tweetService.getTweets(userId);
+    }
+
+
+    @Post()
+    async createTweet(@Body() createTweetDto: CreateTweetDto) {
+        return this.tweetService.CreateTweet(createTweetDto);
+    }
+
+    
+}
