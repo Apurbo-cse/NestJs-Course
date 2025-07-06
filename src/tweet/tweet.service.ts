@@ -19,7 +19,7 @@ export class TweetService {
 
     public async getTweets(userId: number) {
         return await this.tweetRepository.find({
-            where: { user: { id: userId } }, relations: { user: true,hashtags: true }
+            where: { user: { id: userId } }, relations: { user: true, hashtags: true }
         })
     }
 
@@ -63,6 +63,16 @@ export class TweetService {
         tweet.hashtags = hashtags;
 
         return await this.tweetRepository.save(tweet);
+    }
+
+
+
+    public async deleteTweet(id: number) {
+        await this.tweetRepository.delete({
+            id
+        })
+
+        return { deleted: true, id }
     }
 
 
