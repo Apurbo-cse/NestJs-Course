@@ -1,5 +1,6 @@
 // create-tweets.dto.ts
-import { IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
+import { Optional } from '@nestjs/common';
+import { IsNotEmpty, IsOptional, IsString, IsNumber, IsInt, IsArray } from 'class-validator';
 
 export class CreateTweetDto {
   @IsNotEmpty()
@@ -13,4 +14,10 @@ export class CreateTweetDto {
   @IsNotEmpty()
   @IsNumber()
   userId: number;
+
+  @Optional()
+  @IsInt({ each: true })
+  @IsArray()
+  hashtags?: number[]
+
 }
