@@ -14,7 +14,6 @@ export class HashtagService {
 
   public async createHashtag(createHashtagDto: CreateHashtagDto) {
     const hashtag = this.hashtagRepository.create(createHashtagDto);
-
     try {
       return await this.hashtagRepository.save(hashtag);
     } catch (error) {
@@ -27,6 +26,12 @@ export class HashtagService {
     return await this.hashtagRepository.find({
       where: { id: In(hashtags) }
     })
+  }
+
+
+  public async deleteHashtag(id: number) {
+    await this.hashtagRepository.delete({ id });
+    return { deleted: true, id };
   }
 
 }

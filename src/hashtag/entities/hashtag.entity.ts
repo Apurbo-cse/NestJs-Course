@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsString } from "class-validator";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Tweet } from "src/tweet/entities/tweet.entity";
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Hashtag {
@@ -13,4 +14,8 @@ export class Hashtag {
         unique: true,
     })
     name: string
+
+
+    @ManyToMany(() => Tweet, (tweet) => tweet.hashtags, { onDelete: 'CASCADE' })
+    tweets: Tweet[]
 }
