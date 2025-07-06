@@ -3,7 +3,7 @@ import { TweetController } from './tweet.controller';
 import { TweetService } from './tweet.service';
 import { UsersModule } from 'src/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Tweet } from './entity/tweet.entity';
+import { Tweet } from './entities/tweet.entity';
 
 @Module({
   controllers: [TweetController],
