@@ -7,15 +7,19 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfileModule } from './profile/profile.module';
 import { HashtagModule } from './hashtag/hashtag.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     UsersModule,
     TweetModule,
     AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true, 
+    }),
     TypeOrmModule.forRootAsync({
       imports: [],
-      inject:[],
+      inject: [],
       useFactory: () => ({
         type: 'postgres',
         host: 'localhost',
@@ -33,4 +37,4 @@ import { HashtagModule } from './hashtag/hashtag.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
