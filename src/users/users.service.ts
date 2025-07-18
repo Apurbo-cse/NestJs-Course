@@ -1,4 +1,4 @@
-import { Injectable, RequestTimeoutException } from "@nestjs/common";
+import { BadRequestException, Injectable, RequestTimeoutException } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { User } from "./entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -15,7 +15,7 @@ export class UsersService {
             private readonly configService: ConfigService
         ) { }
 
-   public async  getAllUsers() {
+    public async getAllUsers() {
         try {
             return await this.userRepository.find({
                 relations: {
@@ -23,23 +23,39 @@ export class UsersService {
                 }
             })
         } catch (error) {
-            throw new RequestTimeoutException('An error has occured. please try agian later', {
-                description: 'Could not connect to database'
-            })
+
+            if (error.code === 'ECNNREFUED')
+                throw new RequestTimeoutException('An error has occured. please try agian later', {
+                    description: 'Could not connect to database'
+                })
+            console.log('error :>> ', error);
         }
 
     }
 
     public async createUser(userDto: CreateUserDto) {
 
-        // Create a Profile & Save
-        userDto.profile = userDto.profile ?? {}
+        try {
+            // Create a Profile & Save
+            userDto.profile = userDto.profile ?? {}
 
-        // Create User Object
-        let user = this.userRepository.create(userDto)
+            // Create User Object
+            let user = this.userRepository.create(userDto)
 
-        // Save the user object
-        return await this.userRepository.save(user)
+            // Save the user object
+            return await this.userRepository.save(user)
+        } catch (error) {
+
+            if (error.code === 'ECNNREFUED')
+                throw new RequestTimeoutException('An error has occured. please try agian later', {
+                    description: 'Could not connect to database'
+                })
+
+                if( error.code === '23505'){
+                    throw new BadRequestException('There is some duplicate value for the Database')
+                }
+            console.log('error :>> ', error);
+        }
     }
 
     public async deleteUser(id: number) {
