@@ -6,18 +6,39 @@ import { FindManyOptions, FindOptionsWhere, ObjectLiteral, Repository } from 'ty
 export class PaginationProvider {
     public async paginateQuery<T extends ObjectLiteral>(
         paginationQueryDto: PaginationQueryDto,
-        repositroy: Repository<T>,
+        repository: Repository<T>,
         where?: FindOptionsWhere<T>
     ) {
-        const page = paginationQueryDto.page ?? 1;
+        const currentPage = paginationQueryDto.page ?? 1;
         const limit = paginationQueryDto.limit ?? 10;
+
         const findOptions: FindManyOptions<T> = {
-            skip: (page - 1) * limit,
+            skip: (currentPage - 1) * limit,
             take: limit,
-        }
+        };
+
         if (where) {
-            findOptions.where = where
+            findOptions.where = where;
         }
-        return await repositroy.find(findOptions)
+
+        const [result, totalItems] = await repository.findAndCount(findOptions);
+        const totalPages = Math.ceil(totalItems / limit);
+        const nextPage = currentPage === limit ? currentPage : currentPage + 1
+        const previousPage = currentPage === 1 ? currentPage : currentPage - 1
+
+        const response = {
+            data: result,
+            meta: {
+                itemsPerPage: limit,
+                totalItems: totalItems,
+                currentPage: currentPage,
+                totalPages: totalPages,
+            },
+            links: {
+            
+            },
+        };
+
+        return response;
     }
 }
