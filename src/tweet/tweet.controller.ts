@@ -17,7 +17,7 @@ import { CreateTweetDto } from './dto/create-tweets.dto';
 import { UpdateTweetDto } from './dto/update-tweet.dto';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 
-@Controller('tweet')
+@Controller('tweets')
 export class TweetController {
   constructor(private readonly tweetService: TweetService) {}
 
