@@ -18,6 +18,12 @@ export class TweetService {
 
 
     public async getTweets(userId: number) {
+        let user = await this.usersService.findUserById(userId);
+
+        if(!user){
+            throw new NotFoundException(`User with userId ${userId} not found!`)
+        }
+
         return await this.tweetRepository.find({
             where: { user: { id: userId } }, relations: { user: true, hashtags: true }
         })
@@ -26,7 +32,7 @@ export class TweetService {
     public async CreateTweet(createTweetDto: CreateTweetDto) {
 
         // Fetch the full user entity using the userId
-        const user = await this.usersService.findUserById(createTweetDto.userId);
+        let user = await this.usersService.findUserById(createTweetDto.userId);
 
         let hashtags = await this.hashtagService.findHashtags(createTweetDto.hashtags || []);
 
