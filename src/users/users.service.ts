@@ -3,6 +3,8 @@ import {
   HttpException,
   HttpStatus,
   RequestTimeoutException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,12 +14,15 @@ import { UserAlreadyExistsException } from 'src/exceptions/user-already-exists.e
 import { PaginationProvider } from 'src/common/pagination/pagination.provider';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 import { Paginated } from 'src/common/pagination/paginate.interface';
+import { HashingProvider } from 'src/auth/provider/hashing.provider';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private readonly paginationProvider: PaginationProvider
+    private readonly paginationProvider: PaginationProvider,
+    @Inject(forwardRef(() => HashingProvider))
+    private readonly hashingProvider: HashingProvider
   ) { }
 
   // 🔹 Get all users with profile
@@ -57,7 +62,8 @@ export class UsersService {
         throw new UserAlreadyExistsException('Email', userDto.email);
       }
 
-      const newUser = this.userRepository.create(userDto);
+      const newUser = this.userRepository.create({ ...userDto, password: await this.hashingProvider.hashPassword(userDto.password) });
+
       return await this.userRepository.save(newUser);
     } catch (error) {
       this.handleDatabaseError(error, 'createUser');
