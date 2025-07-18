@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   RequestTimeoutException,
 } from '@nestjs/common';
@@ -12,7 +14,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>
+    private userRepository: Repository<User>,
   ) {}
 
   public async getAllUsers() {
@@ -62,11 +64,36 @@ export class UsersService {
   }
 
   public async deleteUser(id: number) {
-    await this.userRepository.delete(id);
-    return { delete: true };
+    const result = await this.userRepository.delete(id);
+    if (result.affected === 0) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: `The user with ID ${id} was not found.`,
+          table: 'user',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return { deleted: true };
   }
 
   public async findUserById(id: number) {
-    return await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: `The user with ID ${id} was not found.`,
+          table: 'user',
+        },
+        HttpStatus.NOT_FOUND,{
+            description:'The exception occured beacuse a user with ID ' +id+ ' was not found!'
+        }
+      );
+    }
+
+    return user;
   }
 }

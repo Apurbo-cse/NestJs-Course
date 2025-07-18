@@ -13,6 +13,11 @@ export class UsersController {
         return this.usersService.getAllUsers();
     }
 
+    @Get(':id')
+    getUserById(@Param('id', ParseIntPipe) id: number) {
+        return this.usersService.findUserById(id);
+    }
+
     @Post()
     async createUser(@Body() user: CreateUserDto) {
         return await this.usersService.createUser(user);
@@ -20,7 +25,7 @@ export class UsersController {
 
     @Delete(':id')
     public deleteUser(@Param('id', ParseIntPipe) id: number) {
-       return this.usersService.deleteUser(id)
+        return this.usersService.deleteUser(id)
     }
 
 
