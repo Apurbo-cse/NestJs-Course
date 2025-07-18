@@ -27,11 +27,10 @@ export class TweetService {
         const page = pageQueryDto.page ?? 1;
         const limit = pageQueryDto.limit ?? 10;
         return await this.tweetRepository.find({
-            where: { user: { id: userId } }, relations: { user: true, hashtags: true },
+            where: { user: { id: userId } },
             skip: (page - 1) * limit,
             take: limit,
         }
-            // limit: 10, page: 1 -skip - 0 take - 10, take -10
 
         )
     }
