@@ -1,73 +1,72 @@
-import { BadRequestException, Injectable, RequestTimeoutException } from "@nestjs/common";
-import { Repository } from "typeorm";
-import { User } from "./entities/user.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { ConfigService } from "@nestjs/config";
+import {
+  BadRequestException,
+  Injectable,
+  RequestTimeoutException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>
+  ) {}
 
-    constructor
-        (
-            @InjectRepository(User)
-            private userRepository: Repository<User>,
-            private readonly configService: ConfigService
-        ) { }
-
-    public async getAllUsers() {
-        try {
-            return await this.userRepository.find({
-                relations: {
-                    profile: true
-                }
-            })
-        } catch (error) {
-
-            if (error.code === 'ECNNREFUED')
-                throw new RequestTimeoutException('An error has occured. please try agian later', {
-                    description: 'Could not connect to database'
-                })
-            console.log('error :>> ', error);
-        }
-
+  public async getAllUsers() {
+    try {
+      return await this.userRepository.find({
+        relations: { profile: true },
+      });
+    } catch (error) {
+      if (error.code === 'ECNNREFUED') {
+        throw new RequestTimeoutException('Database connection error', {
+          description: 'Could not connect to database',
+        });
+      }
+      console.error('getAllUsers error:', error);
+      throw error;
     }
+  }
 
-    public async createUser(userDto: CreateUserDto) {
+  public async createUser(userDto: CreateUserDto) {
+    try {
+      userDto.profile ??= {};
 
-        try {
-            // Create a Profile & Save
-            userDto.profile = userDto.profile ?? {}
+      const [existingUsername, existingEmail] = await Promise.all([
+        this.userRepository.findOne({ where: { userName: userDto.userName } }),
+        this.userRepository.findOne({ where: { email: userDto.email } }),
+      ]);
 
-            // Create User Object
-            let user = this.userRepository.create(userDto)
+      const errors: Record<string, string> = {};
+      if (existingUsername) errors.userName = 'Username already exists.';
+      if (existingEmail) errors.email = 'Email already exists.';
 
-            // Save the user object
-            return await this.userRepository.save(user)
-        } catch (error) {
+      if (Object.keys(errors).length > 0) {
+        throw new BadRequestException(errors);
+      }
 
-            if (error.code === 'ECNNREFUED')
-                throw new RequestTimeoutException('An error has occured. please try agian later', {
-                    description: 'Could not connect to database'
-                })
-
-                if( error.code === '23505'){
-                    throw new BadRequestException('There is some duplicate value for the Database')
-                }
-            console.log('error :>> ', error);
-        }
+      const user = this.userRepository.create(userDto);
+      return await this.userRepository.save(user);
+    } catch (error) {
+      if (error.code === 'ECNNREFUED') {
+        throw new RequestTimeoutException('Database connection error', {
+          description: 'Could not connect to database',
+        });
+      }
+      console.error('createUser error:', error);
+      throw error;
     }
+  }
 
-    public async deleteUser(id: number) {
+  public async deleteUser(id: number) {
+    await this.userRepository.delete(id);
+    return { delete: true };
+  }
 
-        // Delete User
-        await this.userRepository.delete(id)
-
-        // Send a response
-        return { delete: true }
-    }
-
-    public async findUserById(id: number) {
-        return await this.userRepository.findOneBy({ id })
-    }
+  public async findUserById(id: number) {
+    return await this.userRepository.findOneBy({ id });
+  }
 }
