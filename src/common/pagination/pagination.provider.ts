@@ -13,12 +13,14 @@ export class PaginationProvider {
         paginationQueryDto: PaginationQueryDto,
         repository: Repository<T>,
         where?: FindOptionsWhere<T>,
+        relations?: string[]
     ): Promise<Paginated<T>> {
         const page = paginationQueryDto.page ?? 1;
         const limit = paginationQueryDto.limit ?? 10;
 
         const [data, totalItems] = await repository.findAndCount({
             where,
+            relations,
             skip: (page - 1) * limit,
             take: limit,
         });

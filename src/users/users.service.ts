@@ -11,6 +11,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserAlreadyExistsException } from 'src/exceptions/user-already-exists.exception';
 import { PaginationProvider } from 'src/common/pagination/pagination.provider';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
+import { Paginated } from 'src/common/pagination/paginate.interface';
 
 @Injectable()
 export class UsersService {
@@ -21,17 +22,21 @@ export class UsersService {
 
   // 🔹 Get all users with profile
   // 🔹 Get all users with profile and pagination
-public async getAllUsers(pageQueryDto: PaginationQueryDto) {
-  try {
-    return await this.paginationProvider.paginateQuery(
-      pageQueryDto,
-      this.userRepository,
-      {}, // Optional: where condition
-    );
-  } catch (error) {
-    this.handleDatabaseError(error, 'getAllUsers');
+  public async getAllUsers(
+    pageQueryDto: PaginationQueryDto
+  ): Promise<Paginated<User>> {
+    try {
+      return await this.paginationProvider.paginateQuery(
+        pageQueryDto,
+        this.userRepository,
+        {}, // Optional where condition
+        ['profile'] // Eager load profile relation
+      );
+    } catch (error) {
+      this.handleDatabaseError(error, 'getAllUsers');
+      throw error; // Ensure error is thrown after catching
+    }
   }
-}
 
 
   // 🔹 Create new user
