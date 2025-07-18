@@ -9,24 +9,30 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserAlreadyExistsException } from 'src/exceptions/user-already-exists.exception';
+import { PaginationProvider } from 'src/common/pagination/pagination.provider';
+import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-  ) {}
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly paginationProvider: PaginationProvider
+  ) { }
 
   // 🔹 Get all users with profile
-  async getAllUsers() {
-    try {
-      return await this.userRepository.find({
-        relations: { profile: true },
-      });
-    } catch (error) {
-      this.handleDatabaseError(error, 'getAllUsers');
-    }
+  // 🔹 Get all users with profile and pagination
+public async getAllUsers(pageQueryDto: PaginationQueryDto) {
+  try {
+    return await this.paginationProvider.paginateQuery(
+      pageQueryDto,
+      this.userRepository,
+      {}, // Optional: where condition
+    );
+  } catch (error) {
+    this.handleDatabaseError(error, 'getAllUsers');
   }
+}
+
 
   // 🔹 Create new user
   async createUser(userDto: CreateUserDto) {

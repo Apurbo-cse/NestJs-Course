@@ -1,16 +1,16 @@
-
 export interface Paginated<T> {
-    data: T[],
+    data: T[];
     meta: {
-        itemsPerPages: number;
+        itemsPerPage: number;
         totalItems: number;
-        currentPages: number;
-        totalPages: number
-    },
+        currentPage: number;
+        totalPages: number;
+    };
     links: {
         first: string;
         last: string;
         current: string;
-        next: string
-    }
+        next?: string | null;
+        previous?: string | null;
+    };
 }

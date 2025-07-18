@@ -1,44 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
-import { FindManyOptions, FindOptionsWhere, ObjectLiteral, Repository } from 'typeorm';
+import { FindOptionsWhere, ObjectLiteral, Repository } from 'typeorm';
+import { Request } from 'express';
+import { REQUEST } from '@nestjs/core';
+import { Paginated } from './paginate.interface';
 
 @Injectable()
 export class PaginationProvider {
-    public async paginateQuery<T extends ObjectLiteral>(
+    constructor(@Inject(REQUEST) private readonly request: Request) { }
+
+    async paginateQuery<T extends ObjectLiteral>(
         paginationQueryDto: PaginationQueryDto,
         repository: Repository<T>,
-        where?: FindOptionsWhere<T>
-    ) {
-        const currentPage = paginationQueryDto.page ?? 1;
+        where?: FindOptionsWhere<T>,
+    ): Promise<Paginated<T>> {
+        const page = paginationQueryDto.page ?? 1;
         const limit = paginationQueryDto.limit ?? 10;
 
-        const findOptions: FindManyOptions<T> = {
-            skip: (currentPage - 1) * limit,
+        const [data, totalItems] = await repository.findAndCount({
+            where,
+            skip: (page - 1) * limit,
             take: limit,
-        };
+        });
 
-        if (where) {
-            findOptions.where = where;
-        }
-
-        const [result, totalItems] = await repository.findAndCount(findOptions);
         const totalPages = Math.ceil(totalItems / limit);
-        const nextPage = currentPage === limit ? currentPage : currentPage + 1
-        const previousPage = currentPage === 1 ? currentPage : currentPage - 1
+        const baseUrl = `${this.request.protocol}://${this.request.get('host')}${this.request.path}`;
 
-        const response = {
-            data: result,
+        return {
+            data,
             meta: {
                 itemsPerPage: limit,
-                totalItems: totalItems,
-                currentPage: currentPage,
-                totalPages: totalPages,
+                totalItems,
+                currentPage: page,
+                totalPages,
             },
             links: {
-            
+                first: `${baseUrl}?page=1&limit=${limit}`,
+                last: `${baseUrl}?page=${totalPages}&limit=${limit}`,
+                current: `${baseUrl}?page=${page}&limit=${limit}`,
+                next: page < totalPages ? `${baseUrl}?page=${page + 1}&limit=${limit}` : null,
+                previous: page > 1 ? `${baseUrl}?page=${page - 1}&limit=${limit}` : null,
             },
         };
-
-        return response;
     }
 }
