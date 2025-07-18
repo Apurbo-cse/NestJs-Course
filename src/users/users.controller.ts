@@ -18,10 +18,11 @@ export class UsersController {
         return this.usersService.findUserById(id);
     }
 
-    @Post()
-    async createUser(@Body() user: CreateUserDto) {
-        return await this.usersService.createUser(user);
-    }
+    // @Post()
+    // async createUser(@Body() user: CreateUserDto) {
+    //     return await this.usersService.createUser(user);
+    // }
+    
 
     @Delete(':id')
     public deleteUser(@Param('id', ParseIntPipe) id: number) {

@@ -8,7 +8,7 @@ import authConfig from './config/auth.config';
 @Module({
   controllers: [AuthController],
   providers: [AuthService],
-  imports: [forwardRef(() => UsersModule), 
+  imports: [UsersModule,
     ConfigModule.forFeature(authConfig)
   ],
   exports: [AuthService]
