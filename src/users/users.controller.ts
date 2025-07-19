@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, UseGuards, } from "@nestjs/common";
 import { UsersService } from "./users.service";
-import { CreateUserDto } from "./dto/create-user.dto";
 import { PaginationQueryDto } from "src/common/pagination/dto/pagination-query.dto";
+import { AuthorizeGuard } from "src/auth/guards/authorize.guard";
 
 @Controller('users')
 export class UsersController {
@@ -13,15 +13,12 @@ export class UsersController {
         return this.usersService.getAllUsers(paginationQueryDto);
     }
 
+
+    @UseGuards(AuthorizeGuard)
     @Get(':id')
     getUserById(@Param('id', ParseIntPipe) id: number) {
         return this.usersService.findUserById(id);
     }
-
-    // @Post()
-    // async createUser(@Body() user: CreateUserDto) {
-    //     return await this.usersService.createUser(user);
-    // }
     
 
     @Delete(':id')
