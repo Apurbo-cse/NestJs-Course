@@ -6,9 +6,6 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { Profile } from "src/profile/entities/profile.entity";
 import { PaginationModule } from "src/common/pagination/pagination.module";
 import { AuthModule } from "src/auth/auth.module";
-import authConfig from "src/auth/config/auth.config";
-import { ConfigModule } from "@nestjs/config";
-import { JwtModule } from "@nestjs/jwt";
 
 @Module({
     controllers: [UsersController],
@@ -19,8 +16,6 @@ import { JwtModule } from "@nestjs/jwt";
         PaginationModule,
         TypeOrmModule.forFeature([User, Profile]),
         forwardRef(() => AuthModule),
-        ConfigModule.forFeature(authConfig),
-        JwtModule.registerAsync(authConfig.asProvider())
     ]
 })
 
