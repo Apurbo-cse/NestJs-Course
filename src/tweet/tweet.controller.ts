@@ -17,10 +17,11 @@ import { TweetService } from './tweet.service';
 import { CreateTweetDto } from './dto/create-tweets.dto';
 import { UpdateTweetDto } from './dto/update-tweet.dto';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
+import { ActiveUser } from 'src/auth/decorators/active-user.decorator';
 
 @Controller('tweets')
 export class TweetController {
-  constructor(private readonly tweetService: TweetService) {}
+  constructor(private readonly tweetService: TweetService) { }
 
   // ✅ GET /tweets/:userId?page=1&limit=10
   @Get(':userId')
@@ -34,9 +35,9 @@ export class TweetController {
   // ✅ POST /tweets
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createTweet(@Body() tweetDto: CreateTweetDto, @Req() request) {
+  async createTweet(@Body() tweetDto: CreateTweetDto, @ActiveUser() user) {
 
-    console.log('object :>> ', request.user);
+    console.log(user);
     // return this.tweetService.CreateTweet(tweetDto);
   }
 
