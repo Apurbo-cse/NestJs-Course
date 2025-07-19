@@ -109,25 +109,18 @@ export class UsersService {
   }
 
   // 🔹 Find user by Username
-  public async findUserByUsername(username: string): Promise<User> {
-    try {
-      const user = await this.userRepository.findOne({
-        where: { userName: username }, // 🔁 OR use 'username' if that's correct
-      });
+ public async findUserByUsername(username: string): Promise<User> {
+  const user = await this.userRepository.findOne({
+    where: { userName: username },
+    select: ['id', 'userName', 'password', 'email'],
+  });
 
-      if (!user) {
-        throw new UnauthorizedException('User does not exist!');
-      }
-
-      return user;
-    } catch (error) {
-      throw new RequestTimeoutException(error, {
-        description: 'User with given username could not be found',
-      });
-    }
+  if (!user) {
+    throw new UnauthorizedException('User does not exist!');
   }
 
-
+  return user;
+}
 
   // 🔹 Handle connection or other errors
   private handleDatabaseError(error: any, method: string) {

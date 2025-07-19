@@ -8,40 +8,45 @@ import { HashingProvider } from './provider/hashing.provider';
 
 @Injectable()
 export class AuthService {
-    constructor(
-        @Inject(forwardRef(() => UsersService))
-        private readonly userService: UsersService,
+  constructor(
+    @Inject(forwardRef(() => UsersService))
+    private readonly userService: UsersService,
 
-        @Inject(authConfig.KEY)
-        private readonly authConfiguration: ConfigType<typeof authConfig>,
+    @Inject(authConfig.KEY)
+    private readonly authConfiguration: ConfigType<typeof authConfig>,
 
-        @Inject(forwardRef(() => HashingProvider))
-        private readonly hashingProvider: HashingProvider,
-    ) { }
+    @Inject(forwardRef(() => HashingProvider))
+    private readonly hashingProvider: HashingProvider,
+  ) { }
 
-    isAuthenticketd: boolean = false;
+  isAuthenticketd: boolean = false;
 
-    public async login(loginDto: LoginDto) {
-        // Step 1: Find the user with username
-        const user = await this.userService.findUserByUsername(loginDto.userName);
+  public async login(loginDto: LoginDto) {
+    const user = await this.userService.findUserByUsername(loginDto.userName);
 
-        // Step 2: If user not found, findUserByUsername already throws exception
+    console.log('🔐 Raw input password:', loginDto.password);
+    console.log('🔒 Hashed password from DB:', user.password);
 
-        // Step 3: Compare password
-        const isPasswordMatch = await this.hashingProvider.comparePassword(
-            loginDto.password,
-            user.password,
-        );
+    const isPasswordMatch = await this.hashingProvider.comparePassword(
+      loginDto.password,
+      user.password,
+    );
 
-        if (!isPasswordMatch) {
-            throw new UnauthorizedException('Invalid credentials!');
-        }
+    console.log('✅ Password matched?', isPasswordMatch);
 
-        // Step 4: Return success (JWT access token logic can be added here)
-        return user
+    if (!isPasswordMatch) {
+      throw new UnauthorizedException('Invalid credentials!');
     }
 
-    public async signup(createUserDto: CreateUserDto) {
-        return await this.userService.createUser(createUserDto);
+    return {
+      data: user,
+      success: true,
+      message: 'User logged in successfully'
     }
+  }
+
+
+  public async signup(createUserDto: CreateUserDto) {
+    return await this.userService.createUser(createUserDto);
+  }
 }
