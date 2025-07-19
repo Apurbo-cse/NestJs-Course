@@ -7,7 +7,8 @@ import { AuthorizeGuard } from "src/auth/guards/authorize.guard";
 export class UsersController {
 
     constructor(private usersService: UsersService) { }
-
+    
+    @UseGuards(AuthorizeGuard)
     @Get()
     async getUsers(@Query() paginationQueryDto: PaginationQueryDto) {
         return this.usersService.getAllUsers(paginationQueryDto);
@@ -19,7 +20,7 @@ export class UsersController {
     getUserById(@Param('id', ParseIntPipe) id: number) {
         return this.usersService.findUserById(id);
     }
-    
+
 
     @Delete(':id')
     public deleteUser(@Param('id', ParseIntPipe) id: number) {
