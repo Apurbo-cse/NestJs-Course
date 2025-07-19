@@ -35,16 +35,15 @@ export class TweetController {
   // ✅ POST /tweets
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createTweet(@Body() tweetDto: CreateTweetDto, @ActiveUser() user) {
+  async createTweet(@Body() tweet: CreateTweetDto, @ActiveUser('sub') userId) {
 
-    console.log(user);
-    // return this.tweetService.CreateTweet(tweetDto);
+    return this.tweetService.CreateTweet(tweet, userId);
   }
 
   // ✅ PATCH /tweets
   @Patch()
-  async updateTweet(@Body() tweetDto: UpdateTweetDto) {
-    return this.tweetService.updateTweet(tweetDto);
+  async updateTweet(@Body() tweet: UpdateTweetDto) {
+    return this.tweetService.updateTweet(tweet);
   }
 
   // ✅ DELETE /tweets/:id
