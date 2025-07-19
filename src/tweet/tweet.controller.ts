@@ -10,6 +10,7 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 
 import { TweetService } from './tweet.service';
@@ -33,8 +34,10 @@ export class TweetController {
   // ✅ POST /tweets
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createTweet(@Body() tweetDto: CreateTweetDto) {
-    return this.tweetService.CreateTweet(tweetDto);
+  async createTweet(@Body() tweetDto: CreateTweetDto, @Req() request) {
+
+    console.log('object :>> ', request.user);
+    // return this.tweetService.CreateTweet(tweetDto);
   }
 
   // ✅ PATCH /tweets
