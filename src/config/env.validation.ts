@@ -9,8 +9,8 @@ const validationSchema = Joi.object({
   DB_NAME: Joi.string().required(), 
   DB_HOST: Joi.string().required(),
   JWT_TOKEN_SECRET: Joi.string().required(),
-  JWT_TOKEN_EXPIERSIN: Joi.number().required(),
-  REFRESH_TOKEN_EXPIERSIN: Joi.number().required(),
+  JWT_TOKEN_EXPIRESIN: Joi.number().required(),
+  REFRESH_TOKEN_EXPIRESIN: Joi.number().required(),
   JWT_TOKEN_AUDIENCE: Joi.string().required(),
   JWT_TOKEN_ISSUER: Joi.string().required(),
 });

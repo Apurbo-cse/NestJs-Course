@@ -6,6 +6,8 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { HashingProvider } from './provider/hashing.provider';
 import { JwtService } from '@nestjs/jwt';
+import { User } from 'src/users/entities/user.entity';
+import { ActiveUserType } from './interfaces/active-user-type.interface';
 
 @Injectable()
 export class AuthService {
@@ -41,36 +43,8 @@ export class AuthService {
     }
 
 
-    // Generate JWT & Send in the response
-    const token = await this.jwtService.signAsync(
-      {
-        sub: user.id,
-        email: user.email
-      },
-      {
-        secret: this.authConfiguration.secret,
-        expiresIn: this.authConfiguration.expiresIn,
-        audience: this.authConfiguration.audience,
-        issuer: this.authConfiguration.issuer
-      }
-    );
+   return this.generateToken(user)
 
-
-    const refreshtToken = await this.jwtService.signAsync(
-      {
-        sub: user.id,
-      },
-      {
-        secret: this.authConfiguration.secret,
-        expiresIn: this.authConfiguration.refreshTokenExpiresIn,
-        audience: this.authConfiguration.audience,
-        issuer: this.authConfiguration.issuer
-      }
-    );
-
-    return {
-      token: token
-    }
 
 
   }
@@ -93,5 +67,18 @@ export class AuthService {
         issuer: this.authConfiguration.issuer
       }
     );
+  }
+
+
+  private async generateToken(user: User) {
+    // GENERATE AN ACCESS TOKEN
+    const accessToken = await this.signToken<Partial<ActiveUserType>>(user.id, this.authConfiguration.expiresIn,{email:user.email})
+
+    //GENERATE A REFRESH TOKEN
+    const refreshToken = await this.signToken(user.id, this.authConfiguration.refreshTokenExpiresIn)
+
+    return{
+      token: accessToken, refreshToken
+    }
   }
 }
