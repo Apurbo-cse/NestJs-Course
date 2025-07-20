@@ -56,11 +56,21 @@ export class AuthService {
     );
 
 
+    const refreshtToken = await this.jwtService.signAsync(
+      {
+        sub: user.id,
+      },
+      {
+        secret: this.authConfiguration.secret,
+        expiresIn: this.authConfiguration.refreshTokenExpiresIn,
+        audience: this.authConfiguration.audience,
+        issuer: this.authConfiguration.issuer
+      }
+    );
+
     return {
       token: token
     }
-
-
 
 
   }
@@ -68,5 +78,20 @@ export class AuthService {
 
   public async signup(createUserDto: CreateUserDto) {
     return await this.userService.createUser(createUserDto);
+  }
+
+  private async signToken<T>(userId: number, expiresIn: number, payload?: T) {
+    return await this.jwtService.signAsync(
+      {
+        sub: userId,
+        ...payload
+      },
+      {
+        secret: this.authConfiguration.secret,
+        expiresIn: expiresIn,
+        audience: this.authConfiguration.audience,
+        issuer: this.authConfiguration.issuer
+      }
+    );
   }
 }
