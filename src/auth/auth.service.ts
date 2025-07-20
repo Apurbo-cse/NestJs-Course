@@ -8,6 +8,7 @@ import { HashingProvider } from './provider/hashing.provider';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/entities/user.entity';
 import { ActiveUserType } from './interfaces/active-user-type.interface';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -43,7 +44,7 @@ export class AuthService {
     }
 
 
-   return this.generateToken(user)
+    return this.generateToken(user)
 
 
 
@@ -53,6 +54,20 @@ export class AuthService {
   public async signup(createUserDto: CreateUserDto) {
     return await this.userService.createUser(createUserDto);
   }
+
+
+  public async RefreshToen(refreshTokenDto: RefreshTokenDto) {
+      
+    // Verify the Refresh Token
+
+
+    // Find the user DB using ID
+
+
+    // Generate An Access Token & Refresh Token
+
+  }
+
 
   private async signToken<T>(userId: number, expiresIn: number, payload?: T) {
     return await this.jwtService.signAsync(
@@ -72,12 +87,12 @@ export class AuthService {
 
   private async generateToken(user: User) {
     // GENERATE AN ACCESS TOKEN
-    const accessToken = await this.signToken<Partial<ActiveUserType>>(user.id, this.authConfiguration.expiresIn,{email:user.email})
+    const accessToken = await this.signToken<Partial<ActiveUserType>>(user.id, this.authConfiguration.expiresIn, { email: user.email })
 
     //GENERATE A REFRESH TOKEN
     const refreshToken = await this.signToken(user.id, this.authConfiguration.refreshTokenExpiresIn)
 
-    return{
+    return {
       token: accessToken, refreshToken
     }
   }
