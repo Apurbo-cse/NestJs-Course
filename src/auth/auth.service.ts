@@ -9,7 +9,6 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/entities/user.entity';
 import { ActiveUserType } from './interfaces/active-user-type.interface';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { error } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -44,10 +43,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials!');
     }
 
-
     return this.generateToken(user)
-
-
 
   }
 
@@ -78,7 +74,6 @@ export class AuthService {
       throw new UnauthorizedException(error)
 
     }
-
 
   }
 
